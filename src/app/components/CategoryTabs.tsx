@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { LayoutGrid, Newspaper, Cpu, Globe, TrendingUp } from 'lucide-react';
 
-type Category = 'all' | 'politics' | 'technology' | 'breaking';
+type Category = 'all' | 'politics' | 'technology' | 'breaking' | 'global';
 
 const categories = [
   { id: 'all' as Category, label: 'All Claims', icon: LayoutGrid, count: '2,847' },
   { id: 'breaking' as Category, label: 'Breaking Now', icon: TrendingUp, count: '23', urgent: true },
   { id: 'politics' as Category, label: 'Politics', icon: Newspaper, count: '1,243' },
   { id: 'technology' as Category, label: 'Technology', icon: Cpu, count: '892' },
-  { id: 'all' as Category, label: 'Global News', icon: Globe, count: '712' }
+  { id: 'global' as Category, label: 'Global News', icon: Globe, count: '712' }
 ];
 
 export function CategoryTabs() {
