@@ -8,7 +8,7 @@ import { BreakingDebunks } from '../components/BreakingDebunks';
 import { LiveClaimsFeed } from '../components/LiveClaimsFeed';
 import { CategoryTabs } from '../components/CategoryTabs';
 import { FeaturedClaimOfDay } from '../components/FeaturedClaimOfDay';
-import { QuickAnalyzeBar } from '../components/QuickAnalyzeBar';
+import { AnalysisForm } from '../components/AnalysisForm';
 import { NewsTickerBanner } from '../components/NewsTickerBanner';
 import { RealTimeCounter } from '../components/RealTimeCounter';
 
@@ -25,6 +25,11 @@ export function DashboardPage() {
         <div className="glass-dark rounded-3xl p-1">
           <RealTimeCounter />
         </div>
+
+        {/* Verification API Form */}
+        <section className="relative z-50">
+          <AnalysisForm />
+        </section>
 
         {/* Featured Section */}
         <section className="relative group">

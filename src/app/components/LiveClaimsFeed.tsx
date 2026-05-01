@@ -1,9 +1,26 @@
+import { useState, useEffect } from 'react';
 import { Shield, X, CheckCircle, AlertCircle, TrendingUp, Clock, Users, ExternalLink, Share2, BookmarkPlus } from 'lucide-react';
 import { motion } from 'motion/react';
 
-const liveClaimsData = [
-  // ... (data remains the same)
-];
+interface ViralMetrics {
+  shares: string;
+  reach: string;
+  platforms: number;
+}
+
+interface Claim {
+  id: string;
+  timestamp: string;
+  category: string;
+  status: string;
+  confidence: number;
+  headline: string;
+  description: string;
+  thumbnail: string;
+  viralMetrics: ViralMetrics;
+  sources: string[];
+  expert: string;
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -29,6 +46,29 @@ const itemVariants = {
 };
 
 export function LiveClaimsFeed() {
+  const [liveClaimsData, setLiveClaimsData] = useState<Claim[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchClaims() {
+      try {
+        // Fetch from the local API during development or relative /api in production
+        const response = await fetch('/api/claims');
+        if (!response.ok) throw new Error('Failed to fetch claims');
+        const data = await response.json();
+        setLiveClaimsData(data);
+      } catch (error) {
+        console.error('Error fetching claims:', error);
+        // Fallback to empty array if API fails
+        setLiveClaimsData([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchClaims();
+  }, []);
+
   const getStatusConfig = (status: string) => {
     // ... (logic remains the same)
     switch (status) {
@@ -88,14 +128,19 @@ export function LiveClaimsFeed() {
       </div>
 
       {/* Claims List */}
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="space-y-6"
-      >
-        {liveClaimsData.map((claim) => {
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D5BFF]"></div>
+        </div>
+      ) : (
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="space-y-6"
+        >
+          {liveClaimsData.map((claim) => {
           const statusConfig = getStatusConfig(claim.status);
           const StatusIcon = statusConfig.icon;
 
@@ -221,6 +266,7 @@ export function LiveClaimsFeed() {
           );
         })}
       </motion.div>
+      )}
 
       {/* Load More */}
       <div className="text-center pt-6">
