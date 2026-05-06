@@ -17,7 +17,7 @@ export function AnalysisForm() {
       setErrorMessage('');
 
       // Step 1: Submit Text API
-      const submitRes = await fetch('https://verifyai-backend.azurewebsites.net/api/submittext', {
+      const submitRes = await fetch('/api/submitText', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,7 +34,7 @@ export function AnalysisForm() {
 
       // Step 2: Run Analysis API
       setStatus('analyzing');
-      const analyzeRes = await fetch('https://verifyai-backend.azurewebsites.net/api/runanalysis', {
+      const analyzeRes = await fetch('/api/runAnalysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
