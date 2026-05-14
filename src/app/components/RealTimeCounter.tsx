@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { TrendingUp, AlertCircle, Users, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 

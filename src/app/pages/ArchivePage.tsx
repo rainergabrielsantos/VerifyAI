@@ -142,9 +142,9 @@ export function ArchivePage() {
     total: archiveData.length,
     text: archiveData.filter(item => item.type === 'text').length,
     image: archiveData.filter(item => item.type === 'image').length,
-    avgCredibility: Math.round(
+    avgCredibility: archiveData.length > 0 ? Math.round(
       archiveData.reduce((sum, item) => sum + item.credibility, 0) / archiveData.length
-    )
+    ) : 0
   };
 
   return (
@@ -246,8 +246,14 @@ export function ArchivePage() {
         {filteredData.length === 0 ? (
           <div className="bg-[#141B3A] border border-white/10 rounded-xl p-12 text-center">
             <Archive className="w-16 h-16 text-[#94A3B8] mx-auto mb-4" />
-            <p className="text-white text-lg mb-2">No results found</p>
-            <p className="text-[#94A3B8]">Try adjusting your search or filters</p>
+            <p className="text-white text-lg mb-2">
+              {archiveData.length === 0 ? "Your archive is empty" : "No results found"}
+            </p>
+            <p className="text-[#94A3B8]">
+              {archiveData.length === 0 
+                ? "Fact-check a claim to see it saved here automatically." 
+                : "Try adjusting your search or filters"}
+            </p>
           </div>
         ) : (
           filteredData.map((item) => (
