@@ -1,113 +1,55 @@
-import { Archive, Search, Filter, Download, CheckCircle, XCircle, AlertTriangle, Calendar, FileText, Image as ImageIcon } from 'lucide-react';
-import { useState } from 'react';
+import { Archive, Search, Filter, Download, CheckCircle, XCircle, AlertTriangle, Calendar, FileText, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface ArchiveItem {
   id: number;
   type: 'text' | 'image';
   title: string;
-  status: 'true' | 'false' | 'misleading' | 'authentic' | 'manipulated';
+  status: 'true' | 'false' | 'misleading' | 'unverified' | 'authentic' | 'manipulated';
   credibility: number;
   date: string;
   source: string;
+  reasoning?: string;
+  sources?: { name: string; url: string }[];
 }
 
-const archiveData: ArchiveItem[] = [
-  {
-    id: 1,
-    type: 'text',
-    title: 'Global temperatures reached record highs in 2025',
-    status: 'true',
-    credibility: 95,
-    date: '2026-03-05',
-    source: 'Climate.gov'
-  },
-  {
-    id: 2,
-    type: 'image',
-    title: 'hurricane_damage_2026.jpg',
-    status: 'authentic',
-    credibility: 92,
-    date: '2026-03-04',
-    source: 'User Upload'
-  },
-  {
-    id: 3,
-    type: 'text',
-    title: 'New vaccine prevents all forms of cancer',
-    status: 'false',
-    credibility: 15,
-    date: '2026-03-04',
-    source: 'Social Media'
-  },
-  {
-    id: 4,
-    type: 'image',
-    title: 'moon_landing_fake.png',
-    status: 'manipulated',
-    credibility: 23,
-    date: '2026-03-03',
-    source: 'User Upload'
-  },
-  {
-    id: 5,
-    type: 'text',
-    title: 'Tech company announces breakthrough in quantum computing',
-    status: 'misleading',
-    credibility: 62,
-    date: '2026-03-03',
-    source: 'Tech News'
-  },
-  {
-    id: 6,
-    type: 'text',
-    title: 'Study finds 80% reduction in plastic waste in Pacific Ocean',
-    status: 'true',
-    credibility: 88,
-    date: '2026-03-02',
-    source: 'Scientific Journal'
-  },
-  {
-    id: 7,
-    type: 'image',
-    title: 'protest_crowds_enhanced.jpg',
-    status: 'manipulated',
-    credibility: 31,
-    date: '2026-03-02',
-    source: 'News Outlet'
-  },
-  {
-    id: 8,
-    type: 'text',
-    title: 'Miracle cure for diabetes discovered',
-    status: 'false',
-    credibility: 12,
-    date: '2026-03-01',
-    source: 'Unknown'
-  },
-  {
-    id: 9,
-    type: 'image',
-    title: 'wildlife_photo_africa.jpg',
-    status: 'authentic',
-    credibility: 97,
-    date: '2026-02-28',
-    source: 'User Upload'
-  },
-  {
-    id: 10,
-    type: 'text',
-    title: 'Economic growth exceeds forecasts by 20%',
-    status: 'misleading',
-    credibility: 58,
-    date: '2026-02-28',
-    source: 'Financial News'
+const ARCHIVE_KEY = 'verifyai_archive';
+
+function loadArchive(): ArchiveItem[] {
+  try {
+    return JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
+  } catch {
+    return [];
   }
-];
+}
 
 export function ArchivePage() {
+  const [archiveData, setArchiveData] = useState<ArchiveItem[]>(loadArchive);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'text' | 'image'>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+
+  // Keep archive in sync if another tab / page updates localStorage
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === ARCHIVE_KEY) setArchiveData(loadArchive());
+    };
+    window.addEventListener('storage', onStorage);
+    // Also refresh on focus so navigating back from FactCheck shows new items
+    const onFocus = () => setArchiveData(loadArchive());
+    window.addEventListener('focus', onFocus);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, []);
+
+  const handleClearArchive = () => {
+    if (window.confirm('Are you sure you want to clear the entire archive?')) {
+      localStorage.removeItem(ARCHIVE_KEY);
+      setArchiveData([]);
+    }
+  };
 
   const filteredData = archiveData.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -126,13 +68,14 @@ export function ArchivePage() {
     const styles: Record<string, string> = {
       true: 'bg-[#10B981]/20 text-[#10B981]',
       false: 'bg-[#EF4444]/20 text-[#EF4444]',
+      unverified: 'bg-[#94A3B8]/20 text-[#94A3B8]',
       misleading: 'bg-[#F59E0B]/20 text-[#F59E0B]',
       authentic: 'bg-[#10B981]/20 text-[#10B981]',
       manipulated: 'bg-[#EF4444]/20 text-[#EF4444]'
     };
     
     return (
-      <span className={`px-3 py-1 rounded-full text-xs ${styles[status]}`}>
+      <span className={`px-3 py-1 rounded-full text-xs ${styles[status] || 'bg-[#94A3B8]/20 text-[#94A3B8]'}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
@@ -155,10 +98,21 @@ export function ArchivePage() {
           <h1 className="text-4xl text-white mb-2">Debunk Archive</h1>
           <p className="text-lg text-[#94A3B8]">Browse the complete history of community fact-checks and analyses</p>
         </div>
-        <button className="px-5 py-3 bg-gradient-to-r from-[#2D5BFF] to-[#1E4AD9] text-white rounded-lg flex items-center gap-2 hover:shadow-lg hover:shadow-[#2D5BFF]/30 transition-all">
-          <Download className="w-4 h-4" />
-          Export Data
-        </button>
+        <div className="flex gap-3">
+          <button className="px-5 py-3 bg-gradient-to-r from-[#2D5BFF] to-[#1E4AD9] text-white rounded-lg flex items-center gap-2 hover:shadow-lg hover:shadow-[#2D5BFF]/30 transition-all">
+            <Download className="w-4 h-4" />
+            Export Data
+          </button>
+          {archiveData.length > 0 && (
+            <button
+              onClick={handleClearArchive}
+              className="px-5 py-3 bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] rounded-lg flex items-center gap-2 hover:bg-[#EF4444]/20 transition-all"
+            >
+              <Trash2 className="w-4 h-4" />
+              Clear Archive
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stats */}

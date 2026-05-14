@@ -55,7 +55,7 @@ export function FactCheckPage() {
 
       const data = await response.json();
       
-      setResult({
+      const newResult: AnalysisResult = {
         claim: text,
         status: data.status,
         credibility: data.credibility,
@@ -63,7 +63,28 @@ export function FactCheckPage() {
         aiDetection: Math.floor(Math.random() * 10) + 1, // Keep these as random for UI consistency
         claims: Math.floor(Math.random() * 5) + 1,
         reasoning: data.reasoning
-      });
+      };
+
+      setResult(newResult);
+
+      // Save to localStorage archive
+      try {
+        const existing = JSON.parse(localStorage.getItem('verifyai_archive') || '[]');
+        const archiveEntry = {
+          id: Date.now(),
+          type: 'text' as const,
+          title: text.length > 100 ? text.substring(0, 100) + '...' : text,
+          status: data.status,
+          credibility: data.credibility,
+          date: new Date().toISOString(),
+          source: 'User Submission',
+          reasoning: data.reasoning,
+          sources: data.sources || []
+        };
+        localStorage.setItem('verifyai_archive', JSON.stringify([archiveEntry, ...existing]));
+      } catch (e) {
+        console.warn('Could not save to archive:', e);
+      }
     } catch (error) {
       console.error('Error analyzing claim:', error);
       setResult({
