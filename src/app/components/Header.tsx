@@ -1,4 +1,4 @@
-import { Shield, Chrome, Search, Image as ImageIcon, Archive, LayoutDashboard } from 'lucide-react';
+import { Shield, Chrome, Search, Image as ImageIcon, Archive, LayoutDashboard, BookOpen } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 
 export function Header() {
@@ -11,7 +11,7 @@ export function Header() {
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Fact Check', path: '/fact-check', icon: Search },
-    { name: 'Image Analysis', path: '/image-analysis', icon: ImageIcon },
+    { name: 'Trusted Sources', path: '/trusted-sources', icon: BookOpen },
     { name: 'Archive', path: '/archive', icon: Archive },
   ];
 

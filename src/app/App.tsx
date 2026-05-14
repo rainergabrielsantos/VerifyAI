@@ -4,7 +4,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { SubmitMediaPage } from './pages/SubmitMediaPage';
 import { ArchivePage } from './pages/ArchivePage';
 import { FactCheckPage } from './pages/FactCheckPage';
-import { ImageAnalysisPage } from './pages/ImageAnalysisPage';
+import { TrustedSourcesPage } from './pages/TrustedSourcesPage';
 
 export default function App() {
   return (
@@ -17,7 +17,7 @@ export default function App() {
           <Route path="/submit" element={<SubmitMediaPage />} />
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/fact-check" element={<FactCheckPage />} />
-          <Route path="/image-analysis" element={<ImageAnalysisPage />} />
+          <Route path="/trusted-sources" element={<TrustedSourcesPage />} />
         </Routes>
       </main>
     </div>

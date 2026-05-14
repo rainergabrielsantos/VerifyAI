@@ -85,188 +85,120 @@ export function ArchivePage() {
 
   const stats = {
     total: archiveData.length,
-    text: archiveData.filter(item => item.type === 'text').length,
-    image: archiveData.filter(item => item.type === 'image').length,
-    avgCredibility: archiveData.length > 0 ? Math.round(
-      archiveData.reduce((sum, item) => sum + item.credibility, 0) / archiveData.length
-    ) : 0
+    debunked: archiveData.filter(item => item.status === 'false' || item.status === 'manipulated').length,
+    verified: archiveData.filter(item => item.status === 'true' || item.status === 'authentic').length,
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-4xl text-white mb-2">Debunk Archive</h1>
-          <p className="text-lg text-[#94A3B8]">Browse the complete history of community fact-checks and analyses</p>
+    <div className="flex flex-col min-h-[85vh] max-w-5xl mx-auto space-y-10 pb-32">
+      {/* Sleek Hero Section */}
+      <div className="text-center mt-8 animate-in fade-in zoom-in duration-500">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#2D5BFF]/10 border border-[#2D5BFF]/30 rounded-full mb-6">
+          <Archive className="w-4 h-4 text-[#2D5BFF]" />
+          <span className="text-sm font-bold text-[#2D5BFF] uppercase tracking-wider">Your History</span>
         </div>
-        <div className="flex gap-3">
-          <button className="px-5 py-3 bg-gradient-to-r from-[#2D5BFF] to-[#1E4AD9] text-white rounded-lg flex items-center gap-2 hover:shadow-lg hover:shadow-[#2D5BFF]/30 transition-all">
-            <Download className="w-4 h-4" />
-            Export Data
-          </button>
-          {archiveData.length > 0 && (
-            <button
-              onClick={handleClearArchive}
-              className="px-5 py-3 bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] rounded-lg flex items-center gap-2 hover:bg-[#EF4444]/20 transition-all"
-            >
-              <Trash2 className="w-4 h-4" />
-              Clear Archive
-            </button>
-          )}
+        <h1 className="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">
+          Personal <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2D5BFF] to-[#10B981]">Archive</span>
+        </h1>
+        <p className="text-xl text-[#94A3B8] max-w-2xl mx-auto leading-relaxed mb-10">
+          Review your past fact-checks and monitor your verification accuracy over time.
+        </p>
+
+        {/* Minimalist Stats Row */}
+        <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+           <div className="flex flex-col items-center">
+             <span className="text-4xl md:text-5xl font-black text-white">{stats.total}</span>
+             <span className="text-xs font-bold text-[#475569] uppercase tracking-wider mt-2">Total Checked</span>
+           </div>
+           <div className="w-px h-16 bg-white/10 hidden md:block"></div>
+           <div className="flex flex-col items-center">
+             <span className="text-4xl md:text-5xl font-black text-[#EF4444]">{stats.debunked}</span>
+             <span className="text-xs font-bold text-[#EF4444]/70 uppercase tracking-wider mt-2">Debunked</span>
+           </div>
+           <div className="w-px h-16 bg-white/10 hidden md:block"></div>
+           <div className="flex flex-col items-center">
+             <span className="text-4xl md:text-5xl font-black text-[#10B981]">{stats.verified}</span>
+             <span className="text-xs font-bold text-[#10B981]/70 uppercase tracking-wider mt-2">Verified</span>
+           </div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid lg:grid-cols-4 gap-6">
-        <div className="bg-[#141B3A] border border-white/10 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <Archive className="w-5 h-5 text-[#2D5BFF]" />
-            <p className="text-sm text-[#94A3B8]">Total Analyses</p>
-          </div>
-          <p className="text-3xl text-white">{stats.total}</p>
-        </div>
-
-        <div className="bg-[#141B3A] border border-white/10 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <FileText className="w-5 h-5 text-[#2D5BFF]" />
-            <p className="text-sm text-[#94A3B8]">Text Checks</p>
-          </div>
-          <p className="text-3xl text-white">{stats.text}</p>
-        </div>
-
-        <div className="bg-[#141B3A] border border-white/10 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <ImageIcon className="w-5 h-5 text-[#10B981]" />
-            <p className="text-sm text-[#94A3B8]">Image Checks</p>
-          </div>
-          <p className="text-3xl text-white">{stats.image}</p>
-        </div>
-
-        <div className="bg-[#141B3A] border border-white/10 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <CheckCircle className="w-5 h-5 text-[#10B981]" />
-            <p className="text-sm text-[#94A3B8]">Avg Credibility</p>
-          </div>
-          <p className="text-3xl text-white">{stats.avgCredibility}%</p>
-        </div>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="bg-[#141B3A] border border-white/10 rounded-xl p-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1 flex items-center bg-[#1E293B] border border-white/10 rounded-lg px-4 py-2">
-            <Search className="w-5 h-5 text-[#94A3B8] mr-3" />
+      {/* Main Content Area */}
+      <div className="bg-[#141B3A]/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
+        
+        {/* Sleek Toolbar */}
+        <div className="flex flex-col md:flex-row items-center justify-between p-4 border-b border-white/10 bg-[#0A0E27]/50 gap-4">
+          <div className="relative w-full md:w-96">
+            <Search className="w-4 h-4 text-[#475569] absolute left-4 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search archive..."
+              placeholder="Search your archive..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 bg-transparent text-white placeholder:text-[#475569] focus:outline-none"
+              className="w-full bg-[#1E293B]/50 border border-white/5 rounded-full pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#2D5BFF]/50 transition-colors"
             />
           </div>
-
-          {/* Type Filter */}
-          <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-[#94A3B8]" />
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value as 'all' | 'text' | 'image')}
-              className="bg-[#1E293B] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#2D5BFF]"
-            >
-              <option value="all">All Types</option>
-              <option value="text">Text Only</option>
-              <option value="image">Images Only</option>
-            </select>
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            {archiveData.length > 0 && (
+              <button
+                onClick={handleClearArchive}
+                className="flex-1 md:flex-none px-5 py-2.5 bg-[#EF4444]/10 text-[#EF4444] rounded-full text-sm font-bold hover:bg-[#EF4444]/20 transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear
+              </button>
+            )}
           </div>
-
-          {/* Status Filter */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-[#1E293B] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#2D5BFF]"
-          >
-            <option value="all">All Status</option>
-            <option value="true">True</option>
-            <option value="false">False</option>
-            <option value="misleading">Misleading</option>
-            <option value="authentic">Authentic</option>
-            <option value="manipulated">Manipulated</option>
-          </select>
         </div>
-      </div>
 
-      {/* Archive List */}
-      <div className="space-y-4">
-        {filteredData.length === 0 ? (
-          <div className="bg-[#141B3A] border border-white/10 rounded-xl p-12 text-center">
-            <Archive className="w-16 h-16 text-[#94A3B8] mx-auto mb-4" />
-            <p className="text-white text-lg mb-2">
-              {archiveData.length === 0 ? "Your archive is empty" : "No results found"}
-            </p>
-            <p className="text-[#94A3B8]">
-              {archiveData.length === 0 
-                ? "Fact-check a claim to see it saved here automatically." 
-                : "Try adjusting your search or filters"}
-            </p>
-          </div>
-        ) : (
-          filteredData.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setSelectedItem(item)}
-              className="bg-[#141B3A] border border-white/10 rounded-xl p-6 hover:border-[#2D5BFF]/50 transition-colors cursor-pointer group"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-start gap-3 flex-1">
-                  <div className="w-10 h-10 rounded-lg bg-[#1E293B] flex items-center justify-center">
-                    {item.type === 'text' ? (
-                      <FileText className="w-5 h-5 text-[#2D5BFF]" />
-                    ) : (
-                      <ImageIcon className="w-5 h-5 text-[#10B981]" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-white mb-2">{item.title}</h3>
-                    <div className="flex items-center gap-4 text-sm text-[#94A3B8]">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(item.date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric', 
-                          year: 'numeric' 
-                        })}</span>
+        {/* List View */}
+        <div className="p-0">
+          {filteredData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-32 text-center">
+              <Archive className="w-16 h-16 text-[#475569] mb-4 opacity-50" />
+              <h3 className="text-xl font-bold text-white mb-2">No history found</h3>
+              <p className="text-[#94A3B8] text-sm">Your fact-check history will appear here once you analyze a claim.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {filteredData.map((item, index) => (
+                <div 
+                  key={item.id}
+                  onClick={() => setSelectedItem(item)}
+                  className={`group flex flex-col md:flex-row md:items-center justify-between p-6 cursor-pointer transition-all hover:bg-[#2D5BFF]/10 ${
+                    index !== filteredData.length - 1 ? 'border-b border-white/5' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-4 flex-1 pr-6">
+                    <div className="w-12 h-12 rounded-full bg-[#1E293B] flex items-center justify-center border border-white/5 group-hover:border-[#2D5BFF]/30 transition-colors">
+                       {getStatusIcon(item.status)}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#2D5BFF] transition-colors line-clamp-1">
+                        {item.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-xs text-[#475569] font-medium">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        <span>•</span>
+                        <span className="uppercase tracking-wider">{item.status}</span>
                       </div>
-                      <span>•</span>
-                      <span>Source: {item.source}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between md:justify-end gap-6 mt-4 md:mt-0 pl-16 md:pl-0">
+                    <div className="flex flex-col items-start md:items-end">
+                      <span className="text-2xl font-black text-white">{item.credibility}%</span>
+                      <span className="text-[10px] font-bold text-[#475569] uppercase tracking-wider">Credibility</span>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#2D5BFF] transition-colors">
+                       <ExternalLink className="w-4 h-4 text-[#94A3B8] group-hover:text-white transition-colors" />
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  {getStatusIcon(item.status)}
-                  {getStatusBadge(item.status)}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <p className="text-xs text-[#94A3B8] mb-2">Credibility Score</p>
-                  <div className="w-full bg-[#1E293B] rounded-full h-2">
-                    <div
-                      className="h-full rounded-full transition-all"
-                      style={{
-                        width: `${item.credibility}%`,
-                        background: item.credibility >= 70 ? '#10B981' : item.credibility >= 40 ? '#F59E0B' : '#EF4444'
-                      }}
-                    />
-                  </div>
-                </div>
-                <span className="text-sm text-white">{item.credibility}%</span>
-              </div>
+              ))}
             </div>
-          ))
-        )}
+          )}
+        </div>
       </div>
 
       {/* Detail Modal */}
@@ -345,7 +277,7 @@ export function ArchivePage() {
                     <Sparkles className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-wider">AI Reasoning</span>
                   </div>
-                  <div className="bg-[#0A0E27]/30 rounded-2xl p-6 border border-white/5 text-[#94A3B8] leading-relaxed italic">
+                  <div className="bg-[#0A0E27]/30 rounded-2xl p-6 border border-white/5 text-[#94A3B8] leading-relaxed italic whitespace-pre-wrap">
                     {selectedItem.reasoning || "No detailed reasoning archived for this claim."}
                   </div>
                 </div>

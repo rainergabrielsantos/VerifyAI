@@ -69,7 +69,7 @@ export const mockClaims: Claim[] = [
   {
     id: 'claim-006',
     timestamp: '7h ago',
-    category: 'Environment',
+    category: 'Science',
     status: 'debunked',
     confidence: 91,
     headline: 'Ocean Temperatures Drop to Record Lows',
@@ -78,5 +78,44 @@ export const mockClaims: Claim[] = [
     viralMetrics: { shares: '24', reach: '88', platforms: 2 },
     sources: ['NOAA', 'Climate Central'],
     expert: 'Dr. E. Vance'
+  },
+  {
+    id: 'claim-007',
+    timestamp: '15m ago',
+    category: 'Sports',
+    status: 'debunked',
+    confidence: 98,
+    headline: 'Star Quarterback Retiring Before Playoffs',
+    description: 'Fake tweet from a parody account claims the MVP is retiring immediately. Team PR has officially denied it.',
+    thumbnail: 'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?q=80&w=1080&auto=format&fit=crop',
+    viralMetrics: { shares: '500k', reach: '2.1M', platforms: 5 },
+    sources: ['Team PR', 'NFL Network'],
+    expert: 'J. Schefter'
+  },
+  {
+    id: 'claim-008',
+    timestamp: '2h ago',
+    category: 'Entertainment',
+    status: 'suspicious',
+    confidence: 70,
+    headline: 'Pop Icon Secretly Married in Italy',
+    description: 'Paparazzi photos show the singer in a white dress, but sources say it was a music video shoot.',
+    thumbnail: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1080&auto=format&fit=crop',
+    viralMetrics: { shares: '1.2M', reach: '5M', platforms: 4 },
+    sources: ['Entertainment Weekly'],
+    expert: 'A. Rivera'
+  },
+  {
+    id: 'claim-009',
+    timestamp: '5m ago',
+    category: 'Breaking News',
+    status: 'unverified',
+    confidence: 40,
+    headline: 'Massive Earthquake Strikes Pacific Coast',
+    description: 'Reports of shaking in coastal cities. USGS is currently assessing the situation.',
+    thumbnail: 'https://images.unsplash.com/photo-1506544777-64cfbe1142df?q=80&w=1080&auto=format&fit=crop',
+    viralMetrics: { shares: '50k', reach: '200k', platforms: 3 },
+    sources: ['USGS'],
+    expert: 'Seismology Center'
   }
 ];
