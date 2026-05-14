@@ -36,6 +36,13 @@ export function ImageAnalysisPage() {
       };
       reader.readAsDataURL(file);
 
+      // Real stats increment
+      fetch('http://localhost:3001/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ claim: `[Image Analysis]: ${file.name}` })
+      }).catch(err => console.error('Stats update failed:', err));
+
       // Simulate analysis
       setIsAnalyzing(true);
       setTimeout(() => {

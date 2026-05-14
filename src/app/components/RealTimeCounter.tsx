@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { TrendingUp, AlertCircle, Users, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -16,19 +16,31 @@ function AnimatedNumber({ value }: { value: number }) {
 }
 
 export function RealTimeCounter() {
-  const [claimsChecked, setClaimsChecked] = useState(847234);
-  const [activeUsers, setActiveUsers] = useState(3421);
-  const [debunksToday, setDebunksToday] = useState(847);
+  const [stats, setStats] = useState({
+    totalAnalyses: 142,
+    activeUsers: 1,
+    dailyDebunks: 12
+  });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setClaimsChecked(prev => prev + Math.floor(Math.random() * 3));
-      setActiveUsers(prev => prev + Math.floor(Math.random() * 5) - 2);
-      if (Math.random() > 0.85) {
-        setDebunksToday(prev => prev + 1);
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/api/stats');
+        if (res.ok) {
+          const data = await res.json();
+          setStats({
+            totalAnalyses: data.totalAnalyses || stats.totalAnalyses,
+            activeUsers: data.activeUsers || 1,
+            dailyDebunks: data.dailyDebunks || stats.dailyDebunks
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
       }
-    }, 4000);
+    };
 
+    fetchStats();
+    const interval = setInterval(fetchStats, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -54,7 +66,7 @@ export function RealTimeCounter() {
             <div className="flex flex-col">
               <span className="text-[#94A3B8] text-[10px] uppercase tracking-wider font-medium">Global Analyses</span>
               <span className="text-white font-bold tabular-nums text-base">
-                <AnimatedNumber value={claimsChecked} />
+                <AnimatedNumber value={stats.totalAnalyses} />
               </span>
             </div>
           </div>
@@ -68,7 +80,7 @@ export function RealTimeCounter() {
             <div className="flex flex-col">
               <span className="text-[#94A3B8] text-[10px] uppercase tracking-wider font-medium">Users Online</span>
               <span className="text-white font-bold tabular-nums text-base">
-                <AnimatedNumber value={activeUsers} />
+                <AnimatedNumber value={stats.activeUsers} />
               </span>
             </div>
           </div>
@@ -82,7 +94,7 @@ export function RealTimeCounter() {
             <div className="flex flex-col">
               <span className="text-[#94A3B8] text-[10px] uppercase tracking-wider font-medium">Daily Debunks</span>
               <span className="text-white font-bold tabular-nums text-base">
-                <AnimatedNumber value={debunksToday} />
+                <AnimatedNumber value={stats.dailyDebunks} />
               </span>
             </div>
           </div>

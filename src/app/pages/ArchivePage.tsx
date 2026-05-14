@@ -1,5 +1,6 @@
-import { Archive, Search, Filter, Download, CheckCircle, XCircle, AlertTriangle, Calendar, FileText, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Archive, Search, Filter, Download, CheckCircle, XCircle, AlertTriangle, Calendar, FileText, Image as ImageIcon, Trash2, X, ExternalLink, Sparkles, ShieldCheck } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface ArchiveItem {
   id: number;
@@ -28,6 +29,7 @@ export function ArchivePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'text' | 'image'>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [selectedItem, setSelectedItem] = useState<ArchiveItem | null>(null);
 
   // Keep archive in sync if another tab / page updates localStorage
   useEffect(() => {
@@ -75,7 +77,7 @@ export function ArchivePage() {
     };
     
     return (
-      <span className={`px-3 py-1 rounded-full text-xs ${styles[status] || 'bg-[#94A3B8]/20 text-[#94A3B8]'}`}>
+      <span className={`px-3 py-1 rounded-full text-xs ${styles[status]}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
@@ -213,7 +215,8 @@ export function ArchivePage() {
           filteredData.map((item) => (
             <div
               key={item.id}
-              className="bg-[#141B3A] border border-white/10 rounded-xl p-6 hover:border-[#2D5BFF]/50 transition-colors cursor-pointer"
+              onClick={() => setSelectedItem(item)}
+              className="bg-[#141B3A] border border-white/10 rounded-xl p-6 hover:border-[#2D5BFF]/50 transition-colors cursor-pointer group"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-3 flex-1">
@@ -265,6 +268,126 @@ export function ArchivePage() {
           ))
         )}
       </div>
+
+      {/* Detail Modal */}
+      <AnimatePresence>
+        {selectedItem && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedItem(null)}
+              className="absolute inset-0 bg-[#0A0E27]/80 backdrop-blur-md"
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-3xl bg-[#141B3A] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-6 border-b border-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#2D5BFF]/10 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-[#2D5BFF]" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Analysis Details</h3>
+                    <p className="text-xs text-[#94A3B8]">Archived on {new Date(selectedItem.date).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="w-10 h-10 rounded-full hover:bg-white/5 flex items-center justify-center text-[#94A3B8] hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
+                {/* Claim Title */}
+                <div>
+                  <span className="text-[10px] font-bold text-[#475569] uppercase tracking-widest block mb-2">Original Claim</span>
+                  <h2 className="text-2xl font-bold text-white leading-tight">
+                    "{selectedItem.title}"
+                  </h2>
+                </div>
+
+                {/* Score & Status */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-[#0A0E27]/50 rounded-2xl p-4 border border-white/5">
+                    <span className="text-[10px] font-bold text-[#475569] uppercase tracking-widest block mb-2">Verdict</span>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(selectedItem.status)}
+                      <span className="text-lg font-bold text-white uppercase tracking-wider">{selectedItem.status}</span>
+                    </div>
+                  </div>
+                  <div className="bg-[#0A0E27]/50 rounded-2xl p-4 border border-white/5">
+                    <span className="text-[10px] font-bold text-[#475569] uppercase tracking-widest block mb-2">Credibility</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-black text-white">{selectedItem.credibility}%</span>
+                      <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-[#2D5BFF]" 
+                          style={{ width: `${selectedItem.credibility}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reasoning */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-[#2D5BFF]">
+                    <Sparkles className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">AI Reasoning</span>
+                  </div>
+                  <div className="bg-[#0A0E27]/30 rounded-2xl p-6 border border-white/5 text-[#94A3B8] leading-relaxed italic">
+                    {selectedItem.reasoning || "No detailed reasoning archived for this claim."}
+                  </div>
+                </div>
+
+                {/* Sources */}
+                {selectedItem.sources && selectedItem.sources.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-[#10B981]">
+                      <ExternalLink className="w-4 h-4" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Verified Sources</span>
+                    </div>
+                    <div className="grid gap-3">
+                      {selectedItem.sources.map((src, i) => (
+                        <a
+                          key={i}
+                          href={src.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-between p-4 bg-[#0A0E27]/50 border border-white/5 rounded-xl hover:border-[#2D5BFF]/30 hover:bg-[#2D5BFF]/5 transition-all group/link"
+                        >
+                          <span className="text-white font-medium group-hover/link:text-[#2D5BFF] transition-colors">{src.name}</span>
+                          <ExternalLink className="w-4 h-4 text-[#475569] group-hover/link:text-[#2D5BFF]" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-6 bg-[#0A0E27]/50 border-t border-white/5 flex justify-end">
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

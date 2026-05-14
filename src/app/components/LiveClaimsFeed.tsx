@@ -85,6 +85,7 @@ export function LiveClaimsFeed() {
   }, []);
 
   const getStatusConfig = (status: string) => {
+    // ... (logic remains the same)
     switch (status) {
       case 'debunked':
         return {

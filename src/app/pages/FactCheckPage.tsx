@@ -30,7 +30,15 @@ export function FactCheckPage() {
         handleAnalyze(foundClaim.headline, foundClaim);
       }
     }
-  }, [idParam]);
+    
+    // Handle redirect from Dashboard
+    const qParam = searchParams.get('q');
+    if (qParam) {
+      setInputText(qParam);
+      // Use setTimeout to ensure state is settled before analyzing
+      setTimeout(() => handleAnalyze(qParam), 100);
+    }
+  }, [idParam, searchParams]);
 
   const handleAnalyze = async (textToAnalyze?: string, preloadedClaim?: any) => {
     const text = textToAnalyze || inputText || uploadedFile?.name;
@@ -54,13 +62,13 @@ export function FactCheckPage() {
       }
 
       const data = await response.json();
-      
+
       const newResult: AnalysisResult = {
         claim: text,
         status: data.status,
         credibility: data.credibility,
         sources: data.sources || [],
-        aiDetection: Math.floor(Math.random() * 10) + 1, // Keep these as random for UI consistency
+        aiDetection: Math.floor(Math.random() * 10) + 1,
         claims: Math.floor(Math.random() * 5) + 1,
         reasoning: data.reasoning
       };
