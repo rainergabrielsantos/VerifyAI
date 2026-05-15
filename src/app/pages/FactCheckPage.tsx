@@ -2,6 +2,7 @@ import { Search, FileText, Upload, ExternalLink, CheckCircle, XCircle, AlertTria
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { mockClaims } from '../mockData';
+import { post } from '../services/apiClient';
 
 interface AnalysisResult {
   claim: string;
@@ -47,21 +48,9 @@ export function FactCheckPage() {
     setIsAnalyzing(true);
     setResult(null); // Clear previous result
 
-    // Call the local backend API
+    // Call the backend API (works on both Azure SWA and Vercel via VITE_BACKEND_URL)
     try {
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ claim: text }),
-      });
-
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-
-      const data = await response.json();
+      const data = await post<any>('/api/analyze', { claim: text });
 
       const newResult: AnalysisResult = {
         claim: text,
