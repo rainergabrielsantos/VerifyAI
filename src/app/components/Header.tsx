@@ -50,6 +50,9 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
+          <Link to="/login" className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-white/5 text-white border border-white/10 rounded-xl text-sm font-semibold hover:bg-white/10 transition-all active:scale-95">
+            Sign In
+          </Link>
           <button className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#2D5BFF] to-[#1E4AD9] text-white rounded-xl text-sm font-semibold hover:shadow-lg hover:shadow-[#2D5BFF]/40 transition-all active:scale-95 shadow-xl">
             <Chrome className="w-4 h-4" />
             Install Extension

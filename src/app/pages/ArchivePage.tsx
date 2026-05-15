@@ -1,4 +1,4 @@
-import { Archive, Search, Filter, Download, CheckCircle, XCircle, AlertTriangle, Calendar, FileText, Image as ImageIcon, Trash2, X, ExternalLink, Sparkles, ShieldCheck } from 'lucide-react';
+import { Archive, Search, Filter, Download, CheckCircle, XCircle, AlertTriangle, Calendar, FileText, Image as ImageIcon, Trash2, X, ExternalLink, Sparkles, ShieldCheck, Settings, Bell, Sliders, Moon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -30,6 +30,12 @@ export function ArchivePage() {
   const [filterType, setFilterType] = useState<'all' | 'text' | 'image'>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [selectedItem, setSelectedItem] = useState<ArchiveItem | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState({
+    notifications: true,
+    analysisMode: 'standard',
+    darkMode: true
+  });
 
   // Keep archive in sync if another tab / page updates localStorage
   useEffect(() => {
@@ -139,6 +145,13 @@ export function ArchivePage() {
             />
           </div>
           <div className="flex items-center gap-3 w-full md:w-auto">
+            <button
+               onClick={() => setShowSettings(true)}
+               className="flex-1 md:flex-none p-2.5 bg-white/5 border border-white/10 text-[#94A3B8] rounded-full hover:bg-white/10 hover:text-white transition-colors flex items-center justify-center"
+               title="Preferences"
+            >
+               <Settings className="w-5 h-5" />
+            </button>
             {archiveData.length > 0 && (
               <button
                 onClick={handleClearArchive}
@@ -314,6 +327,125 @@ export function ArchivePage() {
                   className="px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors"
                 >
                   Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* Settings Modal */}
+      <AnimatePresence>
+        {showSettings && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSettings(false)}
+              className="absolute inset-0 bg-[#0A0E27]/80 backdrop-blur-md"
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg bg-[#141B3A] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-white/5 bg-[#0A0E27]/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#2D5BFF]/10 flex items-center justify-center">
+                    <Settings className="w-5 h-5 text-[#2D5BFF]" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">User Preferences</h3>
+                    <p className="text-xs text-[#94A3B8]">Manage your account settings</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowSettings(false)}
+                  className="w-10 h-10 rounded-full hover:bg-white/5 flex items-center justify-center text-[#94A3B8] hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-6 md:p-8 space-y-6">
+                {/* Notifications */}
+                <div className="flex items-center justify-between bg-[#0A0E27]/50 p-4 rounded-2xl border border-white/5">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                      <Bell className="w-5 h-5 text-[#10B981]" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white">Push Notifications</h4>
+                      <p className="text-xs text-[#94A3B8]">Alerts for viral claims</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setSettings(s => ({ ...s, notifications: !s.notifications }))}
+                    className={`w-12 h-6 rounded-full transition-colors relative ${settings.notifications ? 'bg-[#10B981]' : 'bg-[#475569]'}`}
+                  >
+                    <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${settings.notifications ? 'left-7' : 'left-1'}`} />
+                  </button>
+                </div>
+
+                {/* Analysis Mode */}
+                <div className="flex items-center justify-between bg-[#0A0E27]/50 p-4 rounded-2xl border border-white/5">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                      <Sliders className="w-5 h-5 text-[#2D5BFF]" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white">Analysis Strictness</h4>
+                      <p className="text-xs text-[#94A3B8]">AI fact-checking threshold</p>
+                    </div>
+                  </div>
+                  <select 
+                    value={settings.analysisMode}
+                    onChange={(e) => setSettings(s => ({ ...s, analysisMode: e.target.value }))}
+                    className="bg-[#1E293B] border border-white/10 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#2D5BFF]"
+                  >
+                    <option value="lenient">Lenient</option>
+                    <option value="standard">Standard</option>
+                    <option value="strict">Strict</option>
+                  </select>
+                </div>
+
+                {/* Appearance */}
+                <div className="flex items-center justify-between bg-[#0A0E27]/50 p-4 rounded-2xl border border-white/5">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                      <Moon className="w-5 h-5 text-[#F59E0B]" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white">Dark Theme</h4>
+                      <p className="text-xs text-[#94A3B8]">Match system appearance</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setSettings(s => ({ ...s, darkMode: !s.darkMode }))}
+                    className={`w-12 h-6 rounded-full transition-colors relative ${settings.darkMode ? 'bg-[#2D5BFF]' : 'bg-[#475569]'}`}
+                  >
+                    <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${settings.darkMode ? 'left-7' : 'left-1'}`} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 bg-[#0A0E27]/50 border-t border-white/5 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowSettings(false)}
+                  className="px-6 py-2 bg-transparent hover:bg-white/5 text-[#94A3B8] hover:text-white rounded-xl font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    alert("Preferences saved successfully!");
+                    setShowSettings(false);
+                  }}
+                  className="px-6 py-2 bg-gradient-to-r from-[#2D5BFF] to-[#1E4AD9] text-white rounded-xl font-bold shadow-lg shadow-[#2D5BFF]/30 hover:shadow-[#2D5BFF]/50 transition-all active:scale-95"
+                >
+                  Save Changes
                 </button>
               </div>
             </motion.div>
